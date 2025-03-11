@@ -1,0 +1,446 @@
+{% extends "base.html" %}
+
+{% block title %}Book Bargain - Find the Best Book Deals{% endblock %}
+
+{% block additional_styles %}
+/* Main layout */
+.main-layout {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .main-layout {
+    flex-direction: row;
+  }
+}
+
+.main-content {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .main-content {
+    width: 75%;
+  }
+}
+
+/* Hero section */
+.hero {
+  position: relative;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  background-image: url('https://source.unsplash.com/random/1200x800/?bookshelf');
+  background-size: cover;
+  background-position: center;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  padding: 0 1.5rem;
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-family: Georgia, serif;
+  color: white;
+  margin-bottom: 1.5rem;
+}
+
+.hero-button {
+  display: inline-block;
+  background-color: #3a1c1c;
+  color: white;
+  padding: 0.75rem 2rem;
+  border-radius: 9999px;
+  transition: background-color 0.3s;
+}
+
+.hero-button:hover {
+  background-color: #5a2c2c;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 100%;
+  background-color: #c27ba0;
+  padding: 2rem 1rem;
+  color: white;
+}
+
+@media (min-width: 768px) {
+  .sidebar {
+    width: 25%;
+  }
+}
+
+.sidebar-link {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  transition: text-decoration 0.3s;
+}
+
+.sidebar-link:hover {
+  text-decoration: underline;
+}
+
+/* Book section */
+.book-section {
+  padding: 3rem 1.5rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+}
+
+.book-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 640px) {
+  .book-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .book-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.book-card {
+  background-color: #a67b95;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.book-image {
+  height: 256px;
+  width: 192px;
+  margin-bottom: 1rem;
+  object-fit: cover;
+  border-radius: 0.25rem;
+}
+
+.book-title {
+  font-size: 1.125rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.book-author {
+  font-size: 0.875rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.book-stores {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.store-tag {
+  background-color: white;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  color: #555;
+}
+
+.view-button {
+  background-color: white;
+  color: #7a4a62;
+  padding: 0.25rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+}
+
+.more-books-button {
+  display: block;
+  margin: 2rem auto 0;
+  border: 1px solid #ccc;
+  color: #555;
+  padding: 0.5rem 1.5rem;
+  border-radius: 9999px;
+  transition: background-color 0.3s;
+}
+
+.more-books-button:hover {
+  background-color: #f0f0f0;
+}
+
+/* Author section */
+.author-section {
+  padding: 3rem 1.5rem;
+}
+
+.author-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .author-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .author-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+.author-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.author-image {
+  height: 96px;
+  width: 96px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #e0e0e0;
+  margin-bottom: 0.5rem;
+  object-fit: cover;
+}
+
+.author-name {
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+/* Store section */
+.store-section {
+  padding: 3rem 1.5rem;
+}
+
+.store-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 640px) {
+  .store-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.store-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.store-logo {
+  height: 64px;
+  width: 64px;
+  margin-bottom: 0.5rem;
+  object-fit: contain;
+}
+
+.store-name {
+  font-size: 0.875rem;
+}
+{% endblock %}
+
+{% block content %}
+<!-- Main Layout -->
+<div class="main-layout">
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content">
+        <h1 class="hero-title">
+          Featured Books of <br>February
+        </h1>
+        <a href="/featured" class="hero-button">
+          Explore now
+        </a>
+      </div>
+    </section>
+
+    <!-- Books Section -->
+    <section class="book-section">
+      <h2 class="section-title">BOOKS IN FOCUS</h2>
+      <div class="book-grid" id="featured-books">
+        <!-- Books will be loaded dynamically -->
+        <div class="spinner" id="books-loading"></div>
+      </div>
+      <a href="/books" class="more-books-button">More Books</a>
+    </section>
+
+    <!-- Authors Section -->
+    <section class="author-section">
+      <h2 class="section-title">FAMOUS AUTHORS</h2>
+      <div class="author-grid">
+        <!-- Author 1 -->
+        <a href="/author/1" class="author-item">
+          <img src="https://source.unsplash.com/random/100x100/?woman" alt="Sudha Murthy" class="author-image">
+          <p class="author-name">Sudha Murthy</p>
+        </a>
+        
+        <!-- Author 2 -->
+        <a href="/author/2" class="author-item">
+          <img src="https://source.unsplash.com/random/100x100/?man" alt="Chetan Bhagat" class="author-image">
+          <p class="author-name">Chetan Bhagat</p>
+        </a>
+        
+        <!-- Author 3 -->
+        <a href="/author/3" class="author-item">
+          <img src="https://source.unsplash.com/random/100x100/?writer" alt="Jane Austen" class="author-image">
+          <p class="author-name">Jane Austen</p>
+        </a>
+        
+        <!-- Author 4 -->
+        <a href="/author/4" class="author-item">
+          <img src="https://source.unsplash.com/random/100x100/?author" alt="Agatha Christie" class="author-image">
+          <p class="author-name">Agatha Christie</p>
+        </a>
+        
+        <!-- Author 5 -->
+        <a href="/author/5" class="author-item">
+          <img src="https://source.unsplash.com/random/100x100/?novelist" alt="J.K Rowling" class="author-image">
+          <p class="author-name">J.K Rowling</p>
+        </a>
+        
+        <!-- Author 6 -->
+        <a href="/author/6" class="author-item">
+          <img src="https://source.unsplash.com/random/100x100/?indian" alt="Arundhati Roy" class="author-image">
+          <p class="author-name">Arundhati Roy</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- Stores Section -->
+    <section class="store-section">
+      <h2 class="section-title">OUR STORES</h2>
+      <div class="store-grid">
+        <!-- Store 1 -->
+        <a href="https://amazon.com" target="_blank" rel="noopener noreferrer" class="store-item">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/1024px-Amazon_logo.svg.png" alt="Amazon" class="store-logo">
+          <p class="store-name">Amazon</p>
+        </a>
+        
+        <!-- Store 2 -->
+        <a href="https://bookswagon.com" target="_blank" rel="noopener noreferrer" class="store-item">
+          <img src="https://www.bookswagon.com/images/logos/logo-new.png" alt="Bookswagon" class="store-logo">
+          <p class="store-name">Bookswagon</p>
+        </a>
+        
+        <!-- Store 3 -->
+        <a href="https://kitabay.com" target="_blank" rel="noopener noreferrer" class="store-item">
+          <img src="https://source.unsplash.com/random/100x100/?bookstore" alt="Kitabay" class="store-logo">
+          <p class="store-name">Kitabay</p>
+        </a>
+      </div>
+    </section>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <a href="/best-sellers" class="sidebar-link">&gt;Best Sellers</a>
+    <a href="/authors" class="sidebar-link">&gt;Author</a>
+    <a href="/genres" class="sidebar-link">&gt;Genre</a>
+    <a href="/languages" class="sidebar-link">&gt;Language</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Fetch featured books when the page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    fetchFeaturedBooks();
+  });
+
+  function fetchFeaturedBooks() {
+    fetch('/api/featured')
+      .then(response => response.json())
+      .then(data => {
+        const booksContainer = document.getElementById('featured-books');
+        const loadingSpinner = document.getElementById('books-loading');
+        
+        // Remove loading spinner
+        if (loadingSpinner) {
+          loadingSpinner.remove();
+        }
+        
+        // Display the books
+        data.forEach(book => {
+          const bookElement = createBookElement(book);
+          booksContainer.appendChild(bookElement);
+        });
+      })
+      .catch(error => {
+        console.error('Error fetching featured books:', error);
+        const booksContainer = document.getElementById('featured-books');
+        const loadingSpinner = document.getElementById('books-loading');
+        
+        // Remove loading spinner
+        if (loadingSpinner) {
+          loadingSpinner.remove();
+        }
+        
+        booksContainer.innerHTML = '<p>Error loading books. Please try again later.</p>';
+      });
+  }
+
+  function createBookElement(book) {
+    const bookDiv = document.createElement('div');
+    bookDiv.className = 'book-card';
+    
+    const websitesHtml = book.websites.map(website => 
+      `<span class="store-tag">${website}</span>`
+    ).join('');
+    
+    bookDiv.innerHTML = `
+      <img src="${book.image_url}" alt="${book.book_name}" class="book-image">
+      <h3 class="book-title">${book.book_name}</h3>
+      <p class="book-author">${book.author || 'Unknown'}</p>
+      <div class="book-stores">
+        ${websitesHtml}
+      </div>
+      <a href="/book/${book.id}" class="view-button">
+        View
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 4px;">
+          <polyline points="9 5 15 12 9 19"></polyline>
+        </svg>
+      </a>
+    `;
+    
+    return bookDiv;
+  }
+</script>
+{% endblock %}
+

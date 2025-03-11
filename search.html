@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results - Book Bargain{% endblock %}
+
+{% block additional_styles %}
+.search-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.search-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.search-results {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .search-results {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .search-results {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .search-results {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.book-card {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.book-image {
+  width: 100%;
+  height: 256px;
+  object-fit: cover;
+}
+
+.book-info {
+  padding: 1rem;
+}
+
+.book-title {
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.book-author {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0.75rem;
+}
+
+.book-stores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.store-tag {
+  background-color: #f3f4f6;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  color: #4b5563;
+}
+
+.book-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.book-price {
+  font-weight: 700;
+  color: #7a4a62;
+}
+
+.view-button {
+  background-color: #7a4a62;
+  color: white;
+  font-size: 0.875rem;
+  padding: 0.25rem 1rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+}
+
+.no-results {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  text-align: center;
+}
+
+.no-results p {
+  font-size: 1.125rem;
+  color: #4b5563;
+  margin-bottom: 1rem;
+}
+
+.home-button {
+  display: inline-block;
+  background-color: #7a4a62;
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 9999px;
+  transition: background-color 0.3s;
+}
+
+.home-button:hover {
+  background-color: #5a2c2c;
+}
+{% endblock %}
+
+{% block content %}
+<div class="search-container">
+  <h1 class="search-title">Search Results for: {{ query }}</h1>
+  
+  <div id="search-loading" class="spinner"></div>
+  <div id="search-results" class="search-results" style="display: none;">
+    <!-- Search results will be loaded dynamically -->
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Get the search query from the URL
+  const searchQuery = "{{ query }}";
+  
+  // Fetch search results when the page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    fetchSearchResults(searchQuery);
+  });
+  
+  function fetchSearchResults(query) {
+    fetch(`/api/search?query=${encodeURIComponent(query)}`)
+      .then(response => response.json())
+      .then(data => {
+        const searchResults = document.getElementById('search-results');
+        const loadingSpinner = document.getElementById('search-loading');
+        
+        // Remove loading spinner
+        if (loadingSpinner) {
+          loadingSpinner.remove();
+        }
+        
+        // Display the search results
+        searchResults.style.display = 'grid';
+        
+        if (data.length === 0 || data.error) {
+          searchResults.innerHTML = `
+            <div class="no-results">
+              <p>No books found matching your search.</p>
+              <a href="/" class="home-button">Return to Home</a>
+            </div>
+          `;
+          // Make the no-results div span all columns
+          searchResults.style.gridTemplateColumns = '1fr';
+        } else {
+          // Group books by name to avoid duplicates
+          const booksByName = {};
+          
+          data.forEach(book => {
+            if (!booksByName[book.book_name]) {
+              booksByName[book.book_name] = {
+                id: book.id || '1', // Default ID if not provided
+                book_name: book.book_name,
+                author: book.author,
+                image_url: book.image_url,
+                websites: [book.website],
+                prices: [book.price]
+              };
+            } else {
+              booksByName[book.book_name].websites.push(book.website);
+              booksByName[book.book_name].prices.push(book.price);
+            }
+          });
+          
+          // Convert the grouped books back to an array
+          const books = Object.values(booksByName);
+          
+          // Display each book
+          searchResults.innerHTML = books.map(book => {
+            // Find the lowest price
+            const lowestPrice = Math.min(...book.prices);
+            
+            // Create website tags
+            const websiteTags = book.websites.map(website => 
+              `<span class="store-tag">${website}</span>`
+            ).join('');
+            
+            return `
+              <div class="book-card">
+                <img src="${book.image_url || 'https://source.unsplash.com/random/200x300/?book'}" alt="${book.book_name}" class="book-image">
+                <div class="book-info">
+                  <h2 class="book-title">${book.book_name}</h2>
+                  <p class="book-author">${book.author || 'Unknown'}</p>
+                  <div class="book-stores">
+                    ${websiteTags}
+                  </div>
+                  <div class="book-footer">
+                    <p class="book-price">₹${lowestPrice.toFixed(2)}</p>
+                    <a href="/book/${book.id}" class="view-button">
+                      View
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 4px;">
+                        <polyline points="9 5 15 12 9 19"></polyline>
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching search results:', error);
+        const searchResults = document.getElementById('search-results');
+        const loadingSpinner = document.getElementById('search-loading');
+        
+        // Remove loading spinner
+        if (loadingSpinner) {
+          loadingSpinner.remove();
+        }
+        
+        searchResults.style.display = 'block';
+        searchResults.innerHTML = `
+          <div class="no-results">
+            <p>Error loading search results. Please try again later.</p>
+            <a href="/" class="home-button">Return to Home</a>
+          </div>
+        `;
+        // Make the no-results div span all columns
+        searchResults.style.gridTemplateColumns = '1fr';
+      });
+  }
+</script>
+{% endblock %}
+
